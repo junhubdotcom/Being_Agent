@@ -1,6 +1,6 @@
 # Being Buddy Agent 🧠💙
 
-An empathetic AI companion built with Google's Agent Development Kit (ADK) that provides emotional support, conversation tracking, and mood analysis. Now integrated with Flutter app via Flask API.
+An empathetic AI companion built with Google's Agent Development Kit (ADK) that provides emotional support, conversation tracking, and mood analysis. Exposed via FastAPI.
 
 ## 🏗️ Project Structure
 
@@ -8,7 +8,7 @@ An empathetic AI companion built with Google's Agent Development Kit (ADK) that 
 agent/
 ├── __init__.py                 # Main agent package exports
 ├── agent.py                    # Root agent definition (Being Buddy)
-├── flask_server.py             # Flask API server for Flutter integration
+├── server.py                   # FastAPI server (single-file entrypoint)
 ├── requirements.txt            # Python dependencies
 ├── .env                        # Environment variables (API keys)
 ├── subagent/                   # Sub-agent implementations
@@ -33,32 +33,45 @@ cp .env.example .env
 # Add your GOOGLE_API_KEY for Gemini
 ```
 
-<!-- Ollama setup removed as the project now uses Google AI Studio exclusively. -->
+### 3. Start the FastAPI server
 
-### 4. Start FastAPI Server
-Run from the project root so Python treats `agent` as a package (prevents relative import errors):
-```bash
-# From the project root (folder that contains the `agent/` directory)
-python -m agent.fastapi_server
-# Server runs on http://localhost:8000
-# API docs available at http://localhost:8000/docs
+Pick one of the following (Windows PowerShell shown; adjust for your shell):
+
+1) From the project root (recommended for package imports):
+```powershell
+python -m uvicorn agent.server:app --reload --host 127.0.0.1 --port 8000
+# or
+python -m uvicorn agent.fastapi_server:app --reload --host 127.0.0.1 --port 8000
 ```
 
-### 5. Test Integration
-```bash
-curl -X POST http://localhost:8000/analyze_conversation \
-  -H "Content-Type: application/json" \
-  -d '{"conversation": "I had a great day today!", "user_id": "test_user"}'
+2) From inside the `agent/` folder (uses top-level imports):
+```powershell
+cd agent
+python -m uvicorn server:app --reload --host 127.0.0.1 --port 8000
+# or
+python server.py  # runs uvicorn via __main__
+```
+
+Server runs at http://127.0.0.1:8000
+Docs at http://127.0.0.1:8000/docs
+
+### 4. Quick test
+```powershell
+Invoke-RestMethod -Method Get -Uri http://127.0.0.1:8000/health
+$body = @{ conversation = "I feel nervous about my exam tomorrow."; user_id = "user_123" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/chat -ContentType 'application/json' -Body $body
 ```
 
 ## 📱 Flutter Integration
 
-The FastAPI server provides these endpoints for the Flutter app:
+The FastAPI server provides these endpoints:
 
+- `GET /` - Service metadata
 - `GET /health` - Health check
 - `GET /docs` - Interactive API documentation
-- `POST /analyze_conversation` - Analyze chat and return EventDetail JSON
-- `GET /test/{user_id}` - Test agent functionality
+- `POST /chat` - Empathetic conversational response
+- `POST /mood/analyze` - Mood analysis JSON
+- `POST /journal/create` - EventDetail JSON via journal agent
 
 ### EventDetail Response Format
 ```json
@@ -108,9 +121,6 @@ The FastAPI server provides these endpoints for the Flutter app:
 - Python 3.9+
 - Google ADK (Agent Development Kit)
 - **Option 1**: Google AI Studio API key (paid) OR
-<!-- Ollama option removed: Project standardized on Google AI Studio. -->
-
-<!-- Ollama setup removed. -->
 
 ### Google AI Studio Setup (Paid Option)
 
@@ -152,8 +162,6 @@ pip install -r agent/requirements.txt
 
 ### Environment Setup
 
-<!-- Ollama environment variables removed. -->
-
 **For Google AI Studio (Paid)**:
 1. Create a `.env` file in the agent directory with your API credentials:
 ```env
@@ -179,16 +187,16 @@ Make sure your virtual environment is activated before running any commands:
 source .venv/bin/activate
 ```
 
-### Method 1: Terminal Interface
-```bash
-# Navigate to the Being project directory
-cd "path/to/Being"
+### Start commands summary
+```powershell
+# From project root (package-style)
+python -m uvicorn agent.server:app --reload --host 127.0.0.1 --port 8000
 
-# Activate virtual environment (if not already active)
-.venv\Scripts\Activate.ps1  # Windows PowerShell
+# From agent folder (top-level)
+python -m uvicorn server:app --reload --host 127.0.0.1 --port 8000
 
-# Run the FastAPI service (module execution)
-python -m agent.fastapi_server
+# Direct Python (uses __main__ in server.py)
+python agent/server.py
 ```
 
 <!-- ADK web UI removed for simplicity. The service is exposed via FastAPI. -->
@@ -289,9 +297,11 @@ Modify the `instruction` field in `agent.py` to change Being Buddy's behavior.
    - If packages not found, reinstall with `pip install google-adk`
    - To deactivate virtual environment: `deactivate`
 
-3. **Import Errors**: Ensure you run the server as a module from the project root:
-  - Correct: `python -m agent.fastapi_server` (run from the folder that contains `agent/`)
-  - Incorrect: `python agent/fastapi_server.py` (may cause "attempted relative import" errors)
+3. **Import Errors**:
+  - Prefer module paths with uvicorn:
+    - Project root: `python -m uvicorn agent.server:app --reload`
+    - Agent folder: `python -m uvicorn server:app --reload`
+  - Running `python server.py` also works; it starts uvicorn internally.
 
 4. **API Key Issues**: Verify your `.env` file is configured correctly (only needed for Google AI Studio)
 

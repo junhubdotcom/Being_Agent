@@ -34,9 +34,17 @@ if __name__ == "__main__" and (__package__ is None or __package__ == ""):
     _sys.path.append(_os.path.dirname(_os.path.dirname(__file__)))
     __package__ = "agent"
 
-from . import root_agent
-from subagent.mood_agent import mood_agent
-from subagent.journal_agent import journal_agent
+# Support both package imports (agent.server) and top-level module imports (server)
+try:
+    # When imported as part of the agent package
+    from . import root_agent
+    from .subagent.mood_agent import mood_agent
+    from .subagent.journal_agent import journal_agent
+except Exception:
+    # When running inside the agent folder (top-level modules)
+    from agent import root_agent  # agent.py in current folder
+    from subagent.mood_agent import mood_agent
+    from subagent.journal_agent import journal_agent
 
 # Load environment variables
 load_dotenv()

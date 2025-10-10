@@ -1,6 +1,12 @@
 from google.adk.agents import Agent
-from subagent.journal_agent import journal_agent
-from subagent.mood_agent import mood_agent
+try:
+    # When imported as part of the agent package (agent.agent)
+    from .subagent.journal_agent import journal_agent
+    from .subagent.mood_agent import mood_agent
+except Exception:
+    # When imported as a top-level module from inside the agent folder
+    from subagent.journal_agent import journal_agent
+    from subagent.mood_agent import mood_agent
 
 root_agent = Agent(
     name="being_buddy_agent",
