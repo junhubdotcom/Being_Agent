@@ -49,13 +49,6 @@ except Exception:
 # Load environment variables
 load_dotenv()
 
-# Check for GOOGLE_API_KEY
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-if GOOGLE_API_KEY:
-    print("GOOGLE_API_KEY is set.")
-else:
-    print("⚠️  GOOGLE_API_KEY is not set. ADK calls will fail; requests will return HTTP 500.")
-
 APP_NAME = "Being Agent Service"
 
 # FastAPI app setup
