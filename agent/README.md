@@ -21,12 +21,14 @@ agent/
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
+
 ```bash
 cd agent
 pip install -r requirements.txt
 ```
 
 ### 2. Configure Environment
+
 ```bash
 # Copy and edit environment file
 cp .env.example .env
@@ -37,14 +39,16 @@ cp .env.example .env
 
 Pick one of the following (Windows PowerShell shown; adjust for your shell):
 
-1) From the project root (recommended for package imports):
+1. From the project root (recommended for package imports):
+
 ```powershell
 python -m uvicorn agent.server:app --reload --host 127.0.0.1 --port 8000
 # or
 python -m uvicorn agent.fastapi_server:app --reload --host 127.0.0.1 --port 8000
 ```
 
-2) From inside the `agent/` folder (uses top-level imports):
+2. From inside the `agent/` folder (uses top-level imports):
+
 ```powershell
 cd agent
 python -m uvicorn server:app --reload --host 127.0.0.1 --port 8000
@@ -56,6 +60,7 @@ Server runs at http://127.0.0.1:8000
 Docs at http://127.0.0.1:8000/docs
 
 ### 4. Quick test
+
 ```powershell
 Invoke-RestMethod -Method Get -Uri http://127.0.0.1:8000/health
 $body = @{ conversation = "I feel nervous about my exam tomorrow."; user_id = "user_123" } | ConvertTo-Json
@@ -74,6 +79,7 @@ The FastAPI server provides these endpoints:
 - `POST /journal/create` - EventDetail JSON via journal agent
 
 ### EventDetail Response Format
+
 ```json
 {
   "title": "Happy Day",
@@ -86,10 +92,11 @@ The FastAPI server provides these endpoints:
 ## 🤖 Agent Architecture
 
 ### Root Agent: Being Buddy
+
 - **Name**: `being_buddy_agent`
 - **Model**: `gemini-2.0-flash`
 - **Role**: Empathetic conversational companion and task orchestrator
-- **Capabilities**: 
+- **Capabilities**:
   - Provides emotional support and validation
   - Decides when to delegate tasks to specialized sub-agents
   - Never provides medical advice or diagnosis
@@ -97,6 +104,7 @@ The FastAPI server provides these endpoints:
 ### Sub-Agents
 
 #### 1. Journal Agent (`journal_agent`)
+
 - **Model**: `gemini-2.0-flash`
 - **Purpose**: Conversation summarization and diary management
 - **Tools**:
@@ -104,13 +112,14 @@ The FastAPI server provides these endpoints:
   - `save_diary()`: Persists diary entries with timestamps and unique IDs
 - **Storage**: In-memory dictionary (MVP - can be replaced with database)
 
-#### 2. Mode Agent (`mode_agent`) 
+#### 2. Mode Agent (`mode_agent`)
+
 - **Model**: `gemini-2.0-flash`
 - **Purpose**: Sentiment analysis and mood timeline tracking
 - **Tools**:
   - `analyze_sentiment()`: Analyzes emotional content and assigns scores (-1 to 1)
   - `append_mood_point()`: Records mood data points over time
-- **Features**: 
+- **Features**:
   - Detects crisis indicators (suicide risk words)
   - Tracks emotional patterns over time
   - Returns structured sentiment analysis
@@ -118,6 +127,7 @@ The FastAPI server provides these endpoints:
 ## 📋 Requirements
 
 ### System Requirements
+
 - Python 3.9+
 - Google ADK (Agent Development Kit)
 - **Option 1**: Google AI Studio API key (paid) OR
@@ -127,6 +137,7 @@ The FastAPI server provides these endpoints:
 ### Virtual Environment Setup (Recommended)
 
 1. **Create a virtual environment**:
+
 ```bash
 # Navigate to the Being project directory
 cd "path/to/Being"
@@ -138,16 +149,19 @@ python -m venv .venv
 2. **Activate the virtual environment**:
 
 **Windows (PowerShell)**:
+
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
 **Windows (Command Prompt)**:
+
 ```cmd
 .venv\Scripts\activate.bat
 ```
 
 **macOS/Linux**:
+
 ```bash
 source .venv/bin/activate
 ```
@@ -155,6 +169,7 @@ source .venv/bin/activate
 3. **Verify activation**: Your terminal prompt should show `(.venv)` at the beginning
 
 ### Dependencies
+
 ```bash
 # Install ADK and related packages (ensure virtual environment is activated)
 pip install -r agent/requirements.txt
@@ -163,7 +178,9 @@ pip install -r agent/requirements.txt
 ### Environment Setup
 
 **For Google AI Studio (Paid)**:
+
 1. Create a `.env` file in the agent directory with your API credentials:
+
 ```env
 GOOGLE_GENAI_USE_VERTEXAI=FALSE
 GOOGLE_API_KEY=your_google_api_key_here
@@ -175,12 +192,14 @@ GOOGLE_API_KEY=your_google_api_key_here
 ## 🚀 How to Start
 
 ### Prerequisites
+
 Make sure your virtual environment is activated before running any commands:
+
 ```bash
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
 
-# Windows Command Prompt  
+# Windows Command Prompt
 .venv\Scripts\activate.bat
 
 # macOS/Linux
@@ -188,6 +207,7 @@ source .venv/bin/activate
 ```
 
 ### Start commands summary
+
 ```powershell
 # From project root (package-style)
 python -m uvicorn agent.server:app --reload --host 127.0.0.1 --port 8000
@@ -204,8 +224,10 @@ python agent/server.py
 ## 🎯 Capabilities & Triggers
 
 ### 1. **Emotional Support & Conversation**
+
 **What it does**: Provides empathetic responses, validation, and reflection
 **How to trigger**: Simply start chatting naturally
+
 ```
 Example:
 User: "I've been feeling really overwhelmed lately..."
@@ -213,10 +235,12 @@ Buddy: "That sounds really challenging. It takes courage to share when you're fe
 ```
 
 ### 2. **Journal & Conversation Logging**
+
 **What it does**: Summarizes and saves conversation sessions as diary entries
 **How to trigger**: Use keywords like:
+
 - "save this conversation"
-- "journal this session" 
+- "journal this session"
 - "log our chat"
 - "record this"
 
@@ -227,9 +251,11 @@ Buddy: [Delegates to journal_agent] → Creates summary and saves with timestamp
 ```
 
 ### 3. **Mood Analysis & Tracking**
+
 **What it does**: Analyzes emotional content and tracks mood patterns over time
 **How to trigger**: Express emotional content naturally
 **Auto-triggered by keywords**:
+
 - Negative: "sad", "depressed", "anxious", "stressed"
 - Positive: "happy", "joy", "glad", "relieved"
 - Crisis: "suicidal", "kill myself", "can't go on"
@@ -241,6 +267,7 @@ Buddy: [Delegates to mode_agent] → Analyzes sentiment, records mood point
 ```
 
 ### 4. **Crisis Detection & Support**
+
 **What it does**: Detects potential self-harm indicators and provides supportive resources
 **How to trigger**: Expressions of self-harm or suicidal ideation
 **Response**: Provides empathetic support + professional resource recommendations
@@ -248,18 +275,21 @@ Buddy: [Delegates to mode_agent] → Analyzes sentiment, records mood point
 ## 🔧 Advanced Usage
 
 ### Testing Individual Components
+
 ```bash
 # Test agent loading
 python -c "from agent import root_agent; print('✓ Agent loaded:', root_agent.name)"
 
-# Test sub-agent configuration  
+# Test sub-agent configuration
 python -c "from agent import root_agent; print('Sub-agents:', [a.name for a in root_agent.sub_agents])"
 ```
 
 ### Customization Options
 
 #### Modify Emotional Keywords
+
 Edit `subagent/mode_agent.py` to adjust sentiment detection:
+
 ```python
 # In analyze_sentiment() function
 if any(w in t for w in ["your", "custom", "sad", "keywords"]):
@@ -267,16 +297,20 @@ if any(w in t for w in ["your", "custom", "sad", "keywords"]):
 ```
 
 #### Change Summary Length
+
 Edit `subagent/journal_agent.py`:
+
 ```python
-# In summarize_text() function  
+# In summarize_text() function
 summary = s if len(s) <= 240 else s[:237] + "..."  # Adjust character limit
 ```
 
 #### Model selection
-The project uses Google AI Studio with `model="gemini-2.0-flash"` across the root agent and sub-agents.
+
+The project uses Google AI Studio with `model="gemini-2.5-flash"` across the root agent and sub-agents.
 
 #### Update System Prompts
+
 Modify the `instruction` field in `agent.py` to change Being Buddy's behavior.
 
 ## 🔒 Privacy & Security
@@ -292,22 +326,25 @@ Modify the `instruction` field in `agent.py` to change Being Buddy's behavior.
 
 <!-- Ollama troubleshooting removed. -->
 
-2. **Virtual Environment Issues**: 
+2. **Virtual Environment Issues**:
+
    - Make sure virtual environment is activated (prompt should show `(.venv)`)
    - If packages not found, reinstall with `pip install google-adk`
    - To deactivate virtual environment: `deactivate`
 
 3. **Import Errors**:
-  - Prefer module paths with uvicorn:
-    - Project root: `python -m uvicorn agent.server:app --reload`
-    - Agent folder: `python -m uvicorn server:app --reload`
-  - Running `python server.py` also works; it starts uvicorn internally.
+
+- Prefer module paths with uvicorn:
+  - Project root: `python -m uvicorn agent.server:app --reload`
+  - Agent folder: `python -m uvicorn server:app --reload`
+- Running `python server.py` also works; it starts uvicorn internally.
 
 4. **API Key Issues**: Verify your `.env` file is configured correctly (only needed for Google AI Studio)
 
 5. **Agent Not Found**: Make sure you're running `adk run agent` from the Being project root
 
 ### Debug Commands
+
 ```bash
 # Check if agent loads correctly
 python -c "from agent import root_agent; print('Success!')"
@@ -322,7 +359,7 @@ adk web --debug
 
 - [ ] Persistent database storage (SQLite/PostgreSQL)
 - [ ] Advanced NLP sentiment analysis
-- [ ] Mood visualization dashboards  
+- [ ] Mood visualization dashboards
 - [ ] Integration with external therapy resources
 - [ ] Multi-user support with privacy separation
 - [ ] Voice conversation support
@@ -331,6 +368,7 @@ adk web --debug
 ## 📞 Support
 
 For issues with:
+
 - **ADK Framework**: [Google ADK Documentation](https://google.github.io/adk-docs/)
 - **Being Agent**: Check the logs in `C:\Users\[user]\AppData\Local\Temp\agents_log\`
 - **API Issues**: [Google AI Studio Support](https://aistudio.google.com/)

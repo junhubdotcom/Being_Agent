@@ -21,7 +21,9 @@ def analyze_sentiment(text: str) -> dict:
     """
     t = text.lower()
     score = 0.0
-    if any(w in t for w in ["suicide", "kill myself", "i can't go on", "i want to die"]):
+    if any(
+        w in t for w in ["suicide", "kill myself", "i can't go on", "i want to die"]
+    ):
         score = -0.95
     elif any(
         w in t for w in ["sad", "depressed", "unhappy", "anxious", "anxiety", "stress"]
@@ -29,9 +31,9 @@ def analyze_sentiment(text: str) -> dict:
         score = -0.6
     elif any(w in t for w in ["happy", "joy", "glad", "relieved", "awesome"]):
         score = 0.7
-    
+
     emotions = ["sadness"] if score < 0 else ["happiness"] if score > 0 else ["neutral"]
-    
+
     # Determine emoji path based on score
     if score >= 0.5:
         emoji_path = "assets/images/goodmood.png"
@@ -39,12 +41,12 @@ def analyze_sentiment(text: str) -> dict:
         emoji_path = "assets/images/badmood.png"
     else:
         emoji_path = "assets/images/moderatemode.png"
-    
+
     return {
-        "score": score, 
-        "emotions": emotions, 
+        "score": score,
+        "emotions": emotions,
         "intensity": abs(score),
-        "emoji_path": emoji_path
+        "emoji_path": emoji_path,
     }
 
 
@@ -65,10 +67,10 @@ def append_mood_point(user_id: str, date_iso: str, score: float) -> dict:
 def get_emoji_for_sentiment(text: str) -> dict:
     """
     Get the appropriate emoji path for the given text sentiment.
-    
+
     Args:
         text (str): Text to analyze for sentiment
-        
+
     Returns:
         dict: {
             "emoji_path": str,
@@ -78,7 +80,7 @@ def get_emoji_for_sentiment(text: str) -> dict:
     """
     sentiment_result = analyze_sentiment(text)
     score = sentiment_result["score"]
-    
+
     # Determine mood label
     if score >= 0.5:
         mood_label = "positive"
@@ -86,18 +88,20 @@ def get_emoji_for_sentiment(text: str) -> dict:
         mood_label = "negative"
     else:
         mood_label = "neutral"
-    
+
     return {
         "emoji_path": sentiment_result["emoji_path"],
         "sentiment_score": score,
-        "mood_label": mood_label
+        "mood_label": mood_label,
     }
 
 
 mood_agent = Agent(
     name="mood_agent",
     model="gemini-2.0-flash-exp",
-    description=("Service agent for sentiment/mood analysis and emoji selection; called by the buddy or journal agents."),
+    description=(
+        "Service agent for sentiment/mood analysis and emoji selection; called by the buddy or journal agents."
+    ),
     instruction=(
         "ROLE: You are MoodAgent, a service agent (not a chat bot). You only serve the caller.\n"
         "TASKS:\n"
@@ -111,11 +115,11 @@ mood_agent = Agent(
         "4) If user_id/date_iso/score are provided for logging, call append_mood_point(user_id, date_iso, score) (tool).\n"
         "OUTPUT (STRICT JSON only):\n"
         "{\n"
-        "  \"score\": float,\n"
-        "  \"emotions\": string[],\n"
-        "  \"intensity\": float,\n"
-        "  \"emoji_path\": string,\n"
-        "  \"mood_label\": string\n"
+        '  "score": float,\n'
+        '  "emotions": string[],\n'
+        '  "intensity": float,\n'
+        '  "emoji_path": string,\n'
+        '  "mood_label": string\n'
         "}\n"
         "CONSTRAINTS:\n"
         "- Do NOT address the end user. Do NOT include explanations. Return JSON only.\n"

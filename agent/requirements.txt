@@ -5,3 +5,4 @@ uvicorn[standard]>=0.24.0
 pydantic>=2.8.0
 google-adk==0.3.0
 deprecated
+google-cloud-storage<3.0.0

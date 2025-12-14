@@ -5,6 +5,7 @@ from google.adk.agents import Agent
 # Simple in-memory storage for MVP (replace with database later)
 DIARIES = {}
 
+
 def save_diary(user_id: str, summary: str) -> dict:
     """
     Persist a diary summary for a user.
@@ -22,10 +23,13 @@ def save_diary(user_id: str, summary: str) -> dict:
     DIARIES.setdefault(user_id, []).append(entry)
     return {"entry_id": entry_id, "summary": summary, "timestamp": ts}
 
+
 journal_agent = Agent(
     name="journal_agent",
     model="gemini-2.0-flash-exp",
-    description=("Service agent that summarizes the conversation and produces EventDetail JSON, consuming mood analysis when available."),
+    description=(
+        "Service agent that summarizes the conversation and produces EventDetail JSON, consuming mood analysis when available."
+    ),
     instruction=(
         "ROLE: You are JournalAgent, a service agent (not a chat bot). You only serve the caller.\n"
         "TASKS:\n"
@@ -41,14 +45,14 @@ journal_agent = Agent(
         "RETURN FORMAT (EventDetail JSON):\n"
         "{\n"
         "  \"date\": ISO-8601 datetime string for 'now',\n"
-        "  \"title\": string (max 3 words),\n"
+        '  "title": string (max 3 words),\n'
         "  \"time\": human-friendly time like '03:21 PM',\n"
-        "  \"description\": first-person diary style string,\n"
-        "  \"entry_id\": string (from save_diary),\n"
-        "  \"timestamp\": ISO-8601 string (from save_diary),\n"
-        "  \"emoji_path\"?: string,\n"
-        "  \"sentiment_score\"?: number,\n"
-        "  \"mood_label\"?: string\n"
+        '  "description": first-person diary style string,\n'
+        '  "entry_id": string (from save_diary),\n'
+        '  "timestamp": ISO-8601 string (from save_diary),\n'
+        '  "emoji_path"?: string,\n'
+        '  "sentiment_score"?: number,\n'
+        '  "mood_label"?: string\n'
         "}\n"
         "CONSTRAINTS:\n"
         "- Titles must be 3 words max. Description must be first-person diary style. STRICT JSON only.\n"
